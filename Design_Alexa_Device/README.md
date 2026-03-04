@@ -10,6 +10,9 @@ If not just say, battery not available. You should also say whether its currentl
 There will four statements to print show method like Charging and battery percentage, charging and no battery, just battery percent and no battery.
 Expectation is to write interface-driven code using appropriate design patterns
 
+https://leetcode.com/discuss/post/1510642/oop-alexa-device-input-output-help-me-de-jlrv/
+
+
 # S0lution
 🧠 45-Minute LLD Interview — Full Walkthrough (English)
 ## 0–3 min: Restate the problem
