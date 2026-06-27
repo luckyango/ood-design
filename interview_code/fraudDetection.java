@@ -27,10 +27,47 @@ import java.util.*;
 import com.fasterxml.jackson.*;
 
 public class fraudDetection {
-    class Event{
+    static class CustomerDetails {
+        String address;
 
+        @JsonProperty("credit_score")
+        int creditScore;
+
+        String email;
+        String phone;
+        String ssn;
     }
-    public boolean isFraud(List<>){
 
+    static class Event {
+        @JsonProperty("customer_details")
+        CustomerDetails customerDetails;
+
+        @JsonProperty("event_type")
+        String eventType;
+
+        @JsonProperty("loan_amount")
+        Integer loanAmount;
+    }
+
+    public List<Event> findFraudUnderwritingEvents(List<Event> events) {
+        Set<String> fraudSsns = new HashSet<>();
+
+        for (Event event : events) {
+            if ("fraud_flag".equals(event.eventType) && event.customerDetails != null) {
+                fraudSsns.add(event.customerDetails.ssn);
+            }
+        }
+
+        List<Event> result = new ArrayList<>();
+
+        for (Event event : events) {
+            if ("underwriting".equals(event.eventType)
+                    && event.customerDetails != null
+                    && fraudSsns.contains(event.customerDetails.ssn)) {
+                result.add(event);
+            }
+        }
+
+        return result;
     }
 }
