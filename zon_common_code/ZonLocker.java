@@ -13,29 +13,52 @@ import java.util.*;
 // 4. code - code content, expiration time
 // 4. user - list of packages
 public class ZonLocker {
+    interface CompartmentSelectStrategy{
+        Compartment select(Parcel parcel, List<Compartment> compartments);
+    }
+    static class SmallestFitStrategy implements CompartmentSelectStrategy{
+        @Override
+        public Compartment select(Parcel parcel, List<Compartment> compartments){
+            Compartment selected = null;
+
+            for(Compartment c: compartments){
+                if(!c.isAvailable() || !c.canFit(parcel)) continue;
+                if(selected == null ||  c.getSize().getRank() < 
+                selected.getSize().getRank()) selected = c;
+
+            }
+
+            return selected;
+        }
+    }
     static class LockerSystem{
         int id; List<Compartment> compartments; Map<String, Compartment> codeToCompartment;
+        CompartmentSelectStrategy selectionStrategy;
         Map<String,Code> codeInfo;
         // method1: find an suitable(based on the package size) and available (based on idle states of compartment) compartment
         //  then return the code
-        public LockerSystem(int id, List<Compartment> compartments){
+        public LockerSystem(int id, List<Compartment> compartments, CompartmentSelectStrategy selectStrategy){
             this.id = id; this.compartments = compartments;
+            this.selectionStrategy = selectStrategy;
             codeToCompartment = new HashMap<>();
             codeInfo = new HashMap<>();
         }
         public String storePackage(Parcel parcel){
-            Compartment selected = findSmallestSuitableLocker(parcel);
+            Compartment selected = selectionStrategy.select(parcel,compartments);
             if(selected == null) throw new IllegalStateException("cant find suitable compartment");
             String codeVal = generateCode();
 
             // build the code
             Code code = new Code(codeVal, System.currentTimeMillis()+Duration.ofHours(6).toMillis());
+            
+            // set the state of the selected compartment
+            selected.setParcel(parcel);
+
             // add the code 
             codeToCompartment.put(codeVal, selected);
             codeInfo.put(codeVal, code);
 
-            // set the state of the selected compartment
-            selected.setParcel(parcel);
+
             
             return codeVal;
         }
@@ -60,17 +83,17 @@ public class ZonLocker {
             return ans;
         }
 
-        public Compartment findSmallestSuitableLocker(Parcel parcel){
-            Compartment seleted = null;
+        // public Compartment findSmallestSuitableLocker(Parcel parcel){
+        //     Compartment seleted = null;
 
-            for(Compartment c: compartments){
-                if(!c.isAvailable() || !c.canFit(parcel)) continue;
-                if(seleted == null || (seleted.isAvailable() && c.size.getRank() < 
-                seleted.size.getRank())) seleted = c;
+        //     for(Compartment c: compartments){
+        //         if(!c.isAvailable() || !c.canFit(parcel)) continue;
+        //         if(seleted == null || (seleted.isAvailable() && c.size.getRank() < 
+        //         seleted.size.getRank())) seleted = c;
 
-            }
-            return seleted;
-        }
+        //     }
+        //     return seleted;
+        // }
         // method2: generate the code for the compartment
         Random rand = new Random();
         public String generateCode(){
@@ -104,6 +127,9 @@ public class ZonLocker {
             Parcel result = parcel;
             parcel=null;
             return result;
+        }
+        public Size getSize(){
+            return size;
         }
     }
     static class Code{
@@ -140,7 +166,6 @@ public class ZonLocker {
         public int getRank(){
             return rank;
         }
-
     }
     static class Parcel{
         private final int weight;
