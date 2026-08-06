@@ -15,10 +15,6 @@ public class AnagramChecker {
         map2.put(c, map2.getOrDefault(c, 0)+1);
         if(map2.get(c) > map1.getOrDefault(c, 0)) return false;
     }
-    if(map1.size() != map2.size()) return false;
-    for(char c: map1.keySet()){
-        if(!map2.containsKey(c) || !map1.get(c).equals(map2.get(c))) return false;
-    }
     return true;
    }
 

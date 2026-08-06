@@ -4,7 +4,7 @@
 // {“from”: “USD”, “to”: “EUR” “rate”:1.1} (“from”: “EUR”, “to”: “GBP” “rate” :1.2}
 import java.util.*;
 public class CurrencyConversion {
-    class RateLog{
+    static class RateLog{
         String from; String to; double rate;
         public RateLog(String from, String to, double rate) {
             this.from = from;
@@ -38,7 +38,7 @@ public class CurrencyConversion {
         return -1.0;
     }
     public static void main(String[] args) {
-        currencyConversion converter = new currencyConversion();
+        CurrencyConversion converter = new CurrencyConversion();
 
         List<RateLog> logs = new ArrayList<>();
 
